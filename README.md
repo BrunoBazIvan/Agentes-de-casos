@@ -91,6 +91,118 @@
 
 ---
 
+## Slash Commands de Claude Code
+
+Dos comandos que orquestan el pipeline completo directamente desde Claude Code, sin intervención manual entre etapas.
+
+---
+
+### `/crear-caso "Nombre del Caso"`
+
+Genera un caso nuevo desde cero, iterando automáticamente hasta que el evaluador diga APTO.
+
+**Ejemplo:**
+```
+/crear-caso "El Reloj de Medianoche"
+```
+
+**Qué hace internamente:**
+
+```
+1. Genera slug: "El Reloj de Medianoche" → el_reloj_de_medianoche
+2. Crea casos/el_reloj_de_medianoche/
+
+Iteración 1:
+  ├── ARQUITECTO → iter_01/arquitectura.md
+  ├── REDACTOR   → iter_01/narrativa.md
+  └── EVALUADOR  → iter_01/evaluacion.md
+       │
+       ├── ✅ APTO     → copia narrativa a caso_final.md, termina
+       ├── ❌ DESCARTAR → reporta razones, termina
+       └── ⚠️ MEJORAR  → lee PASO 14 del evaluador y decide:
+            ├── falla arquitectura → relanza Arquitecto + Redactor con feedback
+            ├── solo falla narrativa → salta Arquitecto, relanza solo Redactor
+            └── ambas → Arquitecto primero, luego Redactor con ambos feedbacks
+
+Iteración 2, 3... (máximo 5)
+```
+
+**Estructura de salida:**
+```
+casos/el_reloj_de_medianoche/
+├── iter_01/
+│   ├── arquitectura.md
+│   ├── narrativa.md
+│   └── evaluacion.md
+├── iter_02/          ← si hubo correcciones
+│   └── ...
+└── caso_final.md     ← cuando el evaluador aprueba
+```
+
+**Lógica de routing:** el comando lee el PASO 1 del evaluador para el veredicto (`✅/⚠️/❌`) y el PASO 14 para decidir si el fallo está en la arquitectura (Etapa 1), en la narrativa (Etapa 2), o en ambas. Eso determina desde qué etapa se relanza la siguiente iteración.
+
+**Límite:** 5 iteraciones máximo como seguridad ante bucles infinitos.
+
+---
+
+### `/corregir-caso <ruta>`
+
+Evalúa y corrige un caso existente. Arranca directamente desde el Evaluador (sin regenerar desde cero).
+
+**Ejemplos:**
+```
+/corregir-caso casos/codex/narrativa.md
+/corregir-caso casos/codex/
+```
+
+**Qué hace internamente:**
+
+```
+1. Lee el archivo de narrativa indicado
+2. Busca en el mismo directorio un archivo con "arquitectura" en el nombre
+   ├── Existe → lo usa como contexto para el evaluador
+   └── No existe → evalúa solo con narrativa (con nota de limitación)
+3. Crea casos/{slug}/correccion_{timestamp}/
+
+Iteración 1:
+  └── EVALUADOR → iter_01_evaluacion.md
+       │
+       ├── ✅ APTO     → guarda caso_corregido.md, termina
+       ├── ❌ DESCARTAR → reporta razones, termina
+       └── ⚠️ MEJORAR  → misma lógica de routing que /crear-caso:
+            ├── falla arquitectura → ARQUITECTO → REDACTOR → volver a EVALUADOR
+            └── solo narrativa → REDACTOR → volver a EVALUADOR
+
+Iteración 2, 3... (máximo 5)
+```
+
+**Estructura de salida:**
+```
+casos/codex/
+├── correccion_20260319_1430/
+│   ├── iter_01_evaluacion.md
+│   ├── iter_02_narrativa.md
+│   ├── iter_02_evaluacion.md
+│   └── ...
+└── caso_corregido.md
+```
+
+**Diferencia clave con `/crear-caso`:** empieza desde el Evaluador, no desde el Arquitecto. Útil cuando ya tienes un caso escrito manualmente y quieres que el sistema lo evalúe y corrija.
+
+---
+
+### Tabla comparativa
+
+| | `/crear-caso` | `/corregir-caso` |
+|---|---|---|
+| Punto de entrada | Arquitecto | Evaluador |
+| Input | Nombre del caso | Archivo de narrativa existente |
+| Output final | `caso_final.md` | `caso_corregido.md` |
+| Usa arquitectura previa | No (la genera) | Sí, si existe en el directorio |
+| Iteraciones máx. | 5 | 5 |
+
+---
+
 ## Qué hace cada mejora de rendimiento
 
 | Técnica | Dónde se aplica | Para qué sirve |
