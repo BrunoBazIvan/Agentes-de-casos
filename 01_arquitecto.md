@@ -13,6 +13,29 @@ Trabaja paso a paso en el orden exacto indicado. No saltes pasos. No combines pa
 
 ---
 
+## PASO 0: LECTURA DEL REGISTRO DE PATRONES
+
+> Este paso es OBLIGATORIO si existe el archivo `casos/_registro.md`. Si no existe o está vacío, continúa directamente al PASO A.
+
+Lee el archivo `casos/_registro.md` y extrae los patrones de los últimos 3 casos registrados:
+- culpable_tipo usado recientemente
+- metodo usado recientemente
+- escenario usado recientemente
+- motivo_tipo usado recientemente
+
+Declara explícitamente qué patrones evitarás en este caso:
+```
+PATRONES A EVITAR (de los últimos casos):
+- culpable_tipo: [lista]
+- metodo: [lista]
+- escenario: [lista]
+- motivo_tipo: [lista]
+```
+
+Si el registro tiene menos de 3 casos, evita solo los que existan. Si está vacío, declara: "Registro vacío — sin restricciones de patrón."
+
+---
+
 ## PASO A: PENSAR ANTES DE DECIDIR
 
 Antes de elegir al culpable, genera internamente 3 posibles soluciones distintas:
@@ -127,6 +150,10 @@ Para cada uno:
 - Motivo real oculto (lo que realmente lo vincula al caso, incluso si es inocente — puede ser un secreto sin relación al crimen)
 - ¿Es culpable o inocente?
 - Si es inocente: ¿qué oculta y por qué?
+- **VOZ NARRATIVA:**
+  - Estilo de habla: [formal / coloquial / evasivo / directo / nervioso / lacónico / verborrágico]
+  - Característica distintiva: [ej: habla en rodeos, responde preguntas con preguntas, usa tecnicismos, cambia de tema cuando se incomoda]
+  - Tic o muletilla (opcional): [ej: "en fin...", "la verdad es que...", pausa larga antes de responder]
 
 Los motivos no pueden ser obvios ni declarados. Deben emerger de conectar datos. Ningún sospechoso puede tener un motivo que se entienda en una sola lectura.
 
@@ -137,6 +164,10 @@ Para cada uno:
 - Qué omite y por qué
 - Si miente en algo: qué y por qué
 - Qué información útil está escondida en su relato
+- **VOZ NARRATIVA:**
+  - Estilo de habla: [formal / coloquial / evasivo / directo / nervioso / lacónico / verborrágico]
+  - Característica distintiva: [ej: muy detallista, habla de sí mismo en tercera persona, desvía hacia anécdotas, da demasiada información irrelevante]
+  - Tic o muletilla (opcional): [ej: "no sé si me explico", "igual no importa", repite fechas con precisión innecesaria]
 
 ---
 
@@ -225,10 +256,12 @@ Responde sí o no a cada pregunta. Si alguna es NO → vuelve y corrige antes de
 - ¿La tabla de elementos distingue cada mueble/objeto con posición y distancia al cuerpo? [sí/no]
 - ¿La tabla de perspectivas define qué aparece al fondo y qué NO desde cada ángulo de cámara? [sí/no]
 - ¿Las restricciones espaciales irrompibles están listadas explícitamente? [sí/no]
+- ¿Cada sospechoso y testigo tiene una VOZ NARRATIVA definida (estilo + característica)? [sí/no]
+- ¿Las voces son suficientemente distintas entre sí (no todos hablan igual)? [sí/no]
 
 Si alguna respuesta es NO → vuelve y completa el paso correspondiente antes de continuar.
 
 ---
 
-Entrega el output completo de todos los pasos (A a I, incluyendo B2). Este output es el insumo para la Etapa 2.
+Entrega el output completo de todos los pasos (0, A a I, incluyendo B2). Este output es el insumo para la Etapa 2.
 ```
